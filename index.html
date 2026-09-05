@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>NovaTech Store</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f6f7f9;
+      color: #111827;
+    }
+
+    /* NAVBAR */
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar {
+      max-width: 1200px;
+      margin: auto;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .logo span {
+      color: #2563eb;
+    }
+
+    nav {
+      display: flex;
+      gap: 25px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #4b5563;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    nav a:hover {
+      color: #2563eb;
+    }
+
+    .cart {
+      background: #111827;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* HERO */
+    .hero {
+      max-width: 1200px;
+      margin: 35px auto;
+      padding: 70px 30px;
+      border-radius: 20px;
+      background: #111827;
+      color: white;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(35px, 6vw, 62px);
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: auto;
+      color: #d1d5db;
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .hero-button {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 14px 24px;
+      background: white;
+      color: #111827;
+      text-decoration: none;
+      border-radius: 9px;
+      font-weight: 700;
+    }
+
+    /* PRODUCTS */
+    .products-section {
+      max-width: 1200px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .section-heading h2 {
+      font-size: 28px;
+    }
+
+    .section-heading a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .product {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden;
+      transition: 0.2s ease;
+    }
+
+    .product:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    .product-image {
+      height: 210px;
+      background: #eef0f3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 65px;
+    }
+
+    .product-info {
+      padding: 18px;
+    }
+
+    .product-info h3 {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .product-info p {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .price {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .buy-button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .buy-button:hover {
+      background: #1d4ed8;
+    }
+
+    /* FEATURES */
+    .features {
+      max-width: 1200px;
+      margin: 70px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature {
+      background: white;
+      padding: 28px;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+    }
+
+    .feature-icon {
+      font-size: 30px;
+      margin-bottom: 15px;
+    }
+
+    .feature h3 {
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      color: #6b7280;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    /* FOOTER */
+    footer {
+      margin-top: 80px;
+      background: #111827;
+      color: white;
+      padding: 45px 20px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .footer-content p {
+      color: #9ca3af;
+      margin-top: 8px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      color: #d1d5db;
+      text-decoration: none;
+    }
+
+    .copyright {
+      max-width: 1200px;
+      margin: 35px auto 0;
+      padding-top: 20px;
+      border-top: 1px solid #374151;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    /* MOBILE */
+    @media (max-width: 850px) {
+      nav {
+        display: none;
+      }
+
+      .products {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-content {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .products {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        margin: 20px;
+        padding: 50px 20px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVIGATION -->
+  <header>
+    <div class="navbar">
+
+      <div class="logo">
+        Nova<span>Tech</span>
+      </div>
+
+      <nav>
+        <a href="#">Home</a>
+        <a href="#products">Products</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="cart">
+        🛒 Cart
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <h1>Technology Made Simple.</h1>
+
+    <p>
+      Discover quality gadgets, electronics and accessories
+      at competitive prices. Shop with confidence and get
+      the support you need.
+    </p>
+
+    <a href="#products" class="hero-button">
+      Shop Products
+    </a>
+
+  </section>
+
+
+  <!-- PRODUCTS -->
+  <section class="products-section" id="products">
+
+    <div class="section-heading">
+      <h2>Popular Products</h2>
+      <a href="#">View all</a>
+    </div>
+
+    <div class="products">
+
+      <div class="product">
+        <div class="product-image">📱</div>
+
+        <div class="product-info">
+          <h3>Smartphone Pro</h3>
+          <p>Powerful smartphone with modern features.</p>
+
+          <div class="price">$399</div>
+
+          <button class="buy-button">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+
+      <div class="product">
+        <div class="product-image">💻</div>
+
+        <div class="product-info">
+          <h3>Ultra Laptop</h3>
+          <p>Fast and lightweight laptop for work.</p>
+
+          <div class="price">$799</div>
+
+          <button class="buy-button">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+
+      <div class="product">
+        <div class="product-image">🎧</div>
+
+        <div class="product-info">
+          <h3>Wireless Headphones</h3>
+          <p>Premium sound with wireless connectivity.</p>
+
+          <div class="price">$89</div>
+
+          <button class="buy-button">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+
+      <div class="product">
+        <div class="product-image">⌚</div>
+
+        <div class="product-info">
+          <h3>Smart Watch</h3>
+          <p>Track your activity and stay connected.</p>
+
+          <div class="price">$129</div>
+
+          <button class="buy-button">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- FEATURES -->
+  <section class="features" id="about">
+
+    <div class="feature">
+      <div class="feature-icon">🚚</div>
+      <h3>Fast Delivery</h3>
+      <p>
+        Get your products delivered quickly and safely.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <h3>Secure Shopping</h3>
+      <p>
+        Shop confidently with secure payment options.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">💬</div>
+      <h3>Customer Support</h3>
+      <p>
+        Have a question? Our customer support is here to help.
+      </p>
+    </div>
+
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer id="contact">
+
+    <div class="footer-content">
+
+      <div>
+        <h2>NovaTech</h2>
+        <p>Your trusted technology store.</p>
+      </div>
+
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+
+    </div>
+
+    <div class="copyright">
+      © 2026 NovaTech. All rights reserved.
+    </div>
+
+  </footer>
+
+
+  <!-- ==========================================
+       SHOPBRAIN AI WIDGET
+       ========================================== -->
+
+  <script
+    src="https://widget.shopbrain.ai/v1.js"
+    data-agent="7232cc32-1cfc-4c49-b239-461887106969">
+  </script>
+
+
+</body>
+</html>
