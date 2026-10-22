@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CB# Studio - Professional Programming Environment</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen flex flex-col overflow-hidden select-none">
+
+    <!-- TOP BAR -->
+    <header class="bg-slate-900 border-b border-slate-800 h-14 px-4 flex items-center justify-between z-20 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white p-2 rounded-lg shadow-lg flex items-center justify-center font-bold text-lg w-9 h-9">
+                CB#
+            </div>
+            <div>
+                <h1 class="font-bold text-base tracking-wide flex items-center gap-2">
+                    CB# Studio <span class="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 font-mono">v1.0</span>
+                </h1>
+            </div>
+            <div class="hidden md:flex items-center space-x-2 pl-4 border-l border-slate-800">
+                <span class="text-xs text-slate-400">Project:</span>
+                <input id="project-name-input" type="text" value="CB Store Project" class="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded px-2 py-1 focus:outline-none focus:border-blue-500 font-sans w-48">
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="flex items-center space-x-2">
+            <button onclick="loadSampleProject()" class="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded border border-slate-700 transition" title="Load sample project">
+                <i class="fa-solid fa-code text-blue-400"></i>
+                <span>Sample</span>
+            </button>
+            <button onclick="createNewProject()" class="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded border border-slate-700 transition" title="Create new project">
+                <i class="fa-solid fa-file-circle-plus text-emerald-400"></i>
+                <span>New</span>
+            </button>
+            <button onclick="saveProject()" class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded border border-slate-700 transition" title="Save to Browser">
+                <i class="fa-solid fa-floppy-disk text-amber-400"></i>
+                <span class="hidden md:inline">Save</span>
+            </button>
+            <button onclick="downloadCBB()" class="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded border border-slate-700 transition" title="Download .cbb file">
+                <i class="fa-solid fa-download text-purple-400"></i>
+                <span>.cbb</span>
+            </button>
+            <button onclick="exportHTML()" class="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded border border-slate-700 transition" title="Export as HTML">
+                <i class="fa-solid fa-file-export text-cyan-400"></i>
+                <span>Export HTML</span>
+            </button>
+            <button onclick="runCBSharp()" class="flex items-center space-x-2 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded shadow-lg shadow-blue-600/30 transition transform active:scale-95">
+                <i class="fa-solid fa-play"></i>
+                <span class="tracking-wide">Run CB#</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="flex-1 flex overflow-hidden relative">
+
+        <!-- LEFT PANEL: PROJECT FILES -->
+        <div id="sidebar" class="w-64 bg-slate-900/90 border-r border-slate-800 flex flex-col shrink-0 transition-all duration-300 z-10 hidden md:flex">
+            <div class="p-3 border-b border-slate-800 flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <span>Project Files</span>
+                <button onclick="createNewProject()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div class="p-2 space-y-1 overflow-y-auto flex-1 text-sm font-sans" id="file-list">
+                <div class="flex items-center space-x-2 px-3 py-2 bg-blue-600/20 border border-blue-500/40 text-blue-300 rounded cursor-pointer">
+                    <i class="fa-solid fa-file-code text-blue-400"></i>
+                    <span class="font-medium text-xs">index.cbb</span>
+                </div>
+                <div class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-800 text-slate-400 rounded cursor-pointer transition" onclick="alert('Multiple files are supported in future expansion. Edit index.cbb for now!')">
+                    <i class="fa-solid fa-file-code text-slate-500"></i>
+                    <span class="text-xs">about.cbb (Linked)</span>
+                </div>
+            </div>
+            <div class="p-3 border-t border-slate-800 bg-slate-950/50 text-xs text-slate-500">
+                <div class="flex items-center justify-between">
+                    <span>Saved Projects:</span>
+                    <span id="saved-count" class="text-slate-400 font-mono">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER PANEL: CODE EDITOR -->
+        <div id="editor-panel" class="flex-1 flex flex-col bg-slate-950 border-r border-slate-800 min-w-0">
+            <!-- Editor Header -->
+            <div class="bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center justify-between text-xs text-slate-400 shrink-0">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-code text-blue-400"></i>
+                    <span class="font-mono text-slate-200">index.cbb</span>
+                    <span class="text-slate-500">| CB# Language Source</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span id="cursor-pos">Ln 1, Col 1</span>
+                    <button onclick="clearEditor()" class="hover:text-red-400 transition" title="Clear Editor"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            </div>
+
+            <!-- Editor Body with Line Numbers & Syntax Highlighting -->
+            <div class="flex-1 relative overflow-hidden flex code-font text-sm">
+                <!-- Line Numbers -->
+                <div id="line-numbers" class="w-12 bg-slate-900/60 border-r border-slate-800 text-slate-600 text-right py-4 pr-3 select-none overflow-hidden leading-relaxed text-xs">
+                    1
+                </div>
+                <!-- Textarea Editor -->
+                <div class="flex-1 relative overflow-auto bg-slate-950">
+                    <textarea id="code-editor" spellcheck="false" oninput="handleEditorInput()" onscroll="syncScroll()" onkeydown="handleKeyDown(event)" onclick="updateCursorPos()" onkeyup="updateCursorPos()" class="w-full h-full bg-transparent text-slate-200 p-4 resize-none focus:outline-none leading-relaxed whitespace-pre wrap-none code-font absolute inset-0 z-10caret-blue-400" style="tab-size: 4;"></textarea>
+                </div>
+            </div>
+
+            <!-- Error Console at Bottom of Editor / Screen -->
+            <div id="console-panel" class="bg-slate-900 border-t border-slate-800 flex flex-col shrink-0 transition-all duration-300" style="height: 140px;">
+                <div class="px-4 py-1.5 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between text-xs text-slate-400 select-none">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-terminal text-amber-400"></i>
+                        <span class="font-medium text-slate-300">Compiler & Error Console</span>
+                        <span id="console-badge" class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono">Ready</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="clearConsole()" class="hover:text-white text-slate-500" title="Clear Console"><i class="fa-solid fa-ban"></i></button>
+                        <button onclick="toggleConsole()" class="hover:text-white text-slate-500"><i id="console-toggle-icon" class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+                <div id="console-output" class="flex-1 p-3 overflow-y-auto code-font text-xs space-y-1 bg-slate-950/80 text-slate-300">
+                    <div class="text-slate-500">[CB# Studio] Environment initialized. Ready to compile CB# code.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: LIVE PREVIEW -->
+        <div id="preview-panel" class="w-full md:w-1/2 lg:w-[55%] flex flex-col bg-slate-900 shrink-0 hidden md:flex">
+            <!-- Preview Header -->
+            <div class="bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center justify-between text-xs text-slate-400 shrink-0">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-globe text-emerald-400"></i>
+                    <span class="font-medium text-slate-200">Live Website Preview</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="bg-slate-800 rounded p-0.5 flex items-center space-x-1 border border-slate-700">
+                        <button onclick="setPreviewMode('desktop')" id="btn-desktop" class="px-2 py-0.5 rounded bg-blue-600 text-white text-[11px] transition">Desktop</button>
+                        <button onclick="setPreviewMode('mobile')" id="btn-mobile" class="px-2 py-0.5 rounded text-slate-400 hover:text-white text-[11px] transition">Mobile</button>
+                    </div>
+                    <button onclick="runCBSharp()" class="p-1.5 hover:bg-slate-800 rounded text-slate-300 transition" title="Refresh Preview"><i class="fa-solid fa-rotate-right"></i></button>
+                    <button onclick="openPreviewInNewTab()" class="p-1.5 hover:bg-slate-800 rounded text-slate-300 transition" title="Open in New Tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+                </div>
+            </div>
+
+            <!-- Preview Container -->
+            <div class="flex-1 bg-slate-950 p-4 flex items-center justify-center overflow-auto relative">
+                <div id="preview-frame-wrapper" class="w-full h-full bg-white rounded-lg shadow-2xl overflow-hidden transition-all duration-300 flex flex-col border border-slate-700">
+                    <iframe id="preview-iframe" class="w-full h-full border-none bg-white" sandbox="allow-scripts allow-modals"></iframe>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MOBILE NAVIGATION TABS -->
+    <div class="md:hidden bg-slate-900 border-t border-slate-800 h-14 flex items-center justify-around z-30 shrink-0">
+        <button onclick="switchMobileTab('editor')" id="mob-tab-editor" class="flex flex-col items-center justify-center flex-1 py-1 text-blue-400">
+            <i class="fa-solid fa-code text-base"></i>
+            <span class="text-[10px] mt-0.5 font-medium">Editor</span>
+        </button>
+        <button onclick="switchMobileTab('preview')" id="mob-tab-preview" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400">
+            <i class="fa-solid fa-globe text-base"></i>
+            <span class="text-[10px] mt-0.5 font-medium">Preview</span>
+        </button>
+        <button onclick="switchMobileTab('console')" id="mob-tab-console" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400">
+            <i class="fa-solid fa-terminal text-base"></i>
+            <span class="text-[10px] mt-0.5 font-medium">Console</span>
+        </button>
+    </div>
+
+    <!-- JAVASCRIPT: CB# PARSER & STUDIO LOGIC -->
+    <script>
+        // Initial Test Code as specified in requirements
+        const sampleCode = `CB#://
+
+Web:#create#(*CB Store*)
+
+Page:#title#(*My Online Store*)
+
+%10001%
+
+Text:#write#(*Welcome to CB Store!*)
+
+Text:#write#(*Discover amazing products at great prices.*)
+
+@ https://google.com
+
+=/cb#`;
+
+        let currentCompiledHtml = '';
+        let currentCompiledTitle = 'CB# Website';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const editor = document.getElementById('code-editor');
+            editor.value = sampleCode;
+            updateLineNumbers();
+            runCBSharp();
+            updateSavedCount();
+        });
+
+        // Line Numbers Synchronization
+        function updateLineNumbers() {
+            const editor = document.getElementById('code-editor');
+            const lineNumbers = document.getElementById('line-numbers');
+            const lines = editor.value.split('\n');
+            let numbersHTML = '';
+            for (let i = 1; i <= Math.max(lines.length, 1); i++) {
+                numbersHTML += `<div>${i}</div>`;
+            }
+            lineNumbers.innerHTML = numbersHTML;
+        }
+
+        function syncScroll() {
+            const editor = document.getElementById('code-editor');
+            const lineNumbers = document.getElementById('line-numbers');
+            lineNumbers.scrollTop = editor.scrollTop;
+        }
+
+        function handleEditorInput() {
+            updateLineNumbers();
+        }
+
+        function handleKeyDown(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+                updateLineNumbers();
+            }
+        }
+
+        function updateCursorPos() {
+            const editor = document.getElementById('code-editor');
+            const text = editor.value.substring(0, editor.selectionStart);
+            const lines = text.split('\n');
+            const line = lines.length;
+            const col = lines[lines.length - 1].length + 1;
+            document.getElementById('cursor-pos').innerText = `Ln ${line}, Col ${col}`;
+        }
+
+        // CB# LANGUAGE PARSER & COMPILER
+        function parseCBSharp(sourceCode) {
+            const lines = sourceCode.split('\n');
+            let htmlContent = '';
+            let pageTitle = 'CB# Website';
+            let currentColor = 'inherit';
+            let hasStart = false;
+            let hasEnd = false;
+            let errors = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                let lineNum = i + 1;
+                let rawLine = lines[i];
+                let line = rawLine.trim();
+
+                if (line === '') continue;
+
+                if (line === 'CB#://') {
+                    hasStart = true;
+                    continue;
+                }
+                if (line === '=/cb#') {
+                    hasEnd = true;
+                    continue;
+                }
+
+                // 1. Web:#create#(*...*)
+                let webCreateMatch = line.match(/^Web:#create#\*\((.*?)\)\*$/);
+                if (webCreateMatch) {
+                    let headingText = escapeHtml(webCreateMatch[1]);
+                    htmlContent += `<h1 style="color: ${currentColor}; font-family: system-ui, -apple-system, sans-serif; font-size: 2.25rem; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.025em;">${headingText}</h1>\n`;
+                    continue;
+                }
+
+                // 2. Page:#title#(*...*)
+                let pageTitleMatch = line.match(/^Page:#title#\*\((.*?)\)\*$/);
+                if (pageTitleMatch) {
+                    pageTitle = escapeHtml(pageTitleMatch[1]);
+                    continue;
+                }
+
+                // 3. Color: %10001% (Blue)
+                let colorMatch = line.match(/^%(\d+)%$/);
+                if (colorMatch) {
+                    let code = colorMatch[1];
+                    if (code === '10001') {
+                        currentColor = '#2563eb'; // Blue
+                    } else {
+                        currentColor = '#2563eb';
+                    }
+                    continue;
+                }
+
+                // 4. Text:#write#(*...*)
+                let textWriteMatch = line.match(/^Text:#write#\*\((.*?)\)\*$/);
+                if (textWriteMatch) {
+                    let text = escapeHtml(textWriteMatch[1]);
+                    htmlContent += `<p style="color: ${currentColor === 'inherit' ? '#1f2937' : currentColor}; font-family: system-ui, -apple-system, sans-serif; font-size: 1.1rem; line-height: 1.6; margin-bottom: 16px;">${text}</p>\n`;
+                    continue;
+                }
+
+                // 5. Link: @ URL or @ file
+                let linkMatch = line.match(/^@\s+(.+)$/);
+                if (linkMatch) {
+                    let target = linkMatch[1].trim();
+                    let href = target;
+                    htmlContent += `<p style="margin-bottom: 16px;"><a href="${escapeHtml(href)}" target="_blank" rel="noopener" style="color: ${currentColor === 'inherit' ? '#2563eb' : currentColor}; text-decoration: underline; font-family: system-ui, -apple-system, sans-serif; font-weight: 500;">${escapeHtml(target)}</a></p>\n`;
+                    continue;
+                }
+
+                // Unrecognized syntax error
+                errors.push({ line: lineNum, message: `Syntax Error: Unrecognized command or invalid syntax "${rawLine}"` });
+            }
+
+            if (!hasStart) {
+                errors.push({ line: 1, message: `Compilation Error: Missing required file header "CB#://"` });
+            }
+            if (!hasEnd) {
+                errors.push({ line: lines.length, message: `Compilation Error: Missing required section close "=/cb#"` });
+            }
+
+            return {
+                success: errors.length === 0,
+                errors: errors,
+                pageTitle: pageTitle,
+                html: htmlContent
+            };
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Run CB# Code Execution
+        function runCBSharp() {
+            const code = document.getElementById('code-editor').value;
+            const result = parseCBSharp(code);
+            const consoleOutput = document.getElementById('console-output');
+            const consoleBadge = document.getElementById('console-badge');
+
+            const timestamp = new Date().toLocaleTimeString();
+
+            if (result.success) {
+                currentCompiledTitle = result.pageTitle;
+                currentCompiledHtml = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${result.pageTitle}</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; padding: 32px; margin: 0; background: #ffffff; color: #1f2937; }
+    </style>
+</head>
+<body>
+    ${result.html}
+</body>
+</html>`;
+
+                // Render in iframe
+                const iframe = document.getElementById('preview-iframe');
+                iframe.srcdoc = currentCompiledHtml;
+
+                // Update console
+                consoleBadge.className = "px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono";
+                consoleBadge.innerText = "Success";
+                consoleOutput.innerHTML += `<div class="text-emerald-400">[${timestamp}] Success: Compiled successfully. Website generated with title "${result.pageTitle}".</div>`;
+            } else {
+                // Display errors
+                consoleBadge.className = "px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 text-[10px] font-mono";
+                consoleBadge.innerText = "Failed";
+                
+                let errorHtml = `<div class="text-red-400 font-bold">[${timestamp}] Compilation Failed with ${result.errors.length} error(s):</div>`;
+                result.errors.forEach(err => {
+                    errorHtml += `<div class="text-red-300 pl-4">➔ Line ${err.line}: ${err.message}</div>`;
+                });
+                consoleOutput.innerHTML += errorHtml;
+
+                // Show error state in preview
+                const iframe = document.getElementById('preview-iframe');
+                iframe.srcdoc = `<!DOCTYPE html><html><body style="font-family:sans-serif; padding:24px; color:#ef4444;"><h2 style="margin-top:0;">Compilation Error</h2><p>Please check the Error Console below the editor for details.</p></body></html>`;
+            }
+
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // File & Project Actions
+        function loadSampleProject() {
+            document.getElementById('code-editor').value = sampleCode;
+            updateLineNumbers();
+            runCBSharp();
+            logConsole("Sample project loaded successfully.");
+        }
+
+        function clearEditor() {
+            if (confirm("Are you sure you want to clear the editor?")) {
+                document.getElementById('code-editor').value = "CB#://\n\n=/cb#";
+                updateLineNumbers();
+                runCBSharp();
+                logConsole("Editor cleared.");
+            }
+        }
+
+        function createNewProject() {
+            const projectName = prompt("Enter new project name:", "MyCBProject");
+            if (projectName) {
+                document.getElementById('project-name-input').value = projectName;
+                document.getElementById('code-editor').value = "CB#://\n\nWeb:#create#(" + projectName + ")\n\nPage:#title#(" + projectName + ")\n\nText:#write#(Hello from CB# Studio!)\n\n=/cb#";
+                updateLineNumbers();
+                runCBSharp();
+                logConsole(`New project "${projectName}" created.`);
+            }
+        }
+
+        function saveProject() {
+            const projectName = document.getElementById('project-name-input').value.trim() || "Untitled";
+            const code = document.getElementById('code-editor').value;
+            let projects = JSON.parse(localStorage.getItem('cb_studio_projects') || '{}');
+            projects[projectName] = code;
+            localStorage.setItem('cb_studio_projects', JSON.stringify(projects));
+            updateSavedCount();
+            logConsole(`Project "${projectName}" saved to browser localStorage.`);
+            alert(`Project "${projectName}" saved successfully!`);
+        }
+
+        function updateSavedCount() {
+            let projects = JSON.parse(localStorage.getItem('cb_studio_projects') || '{}');
+            document.getElementById('saved-count').innerText = Object.keys(projects).length;
+        }
+
+        function downloadCBB() {
+            const code = document.getElementById('code-editor').value;
+            const projectName = document.getElementById('project-name-input').value.trim() || "project";
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${projectName.toLowerCase().replace(/\s+/g, '_')}.cbb`;
+            a.click();
+            URL.revokeObjectURL(url);
+            logConsole("Source code downloaded as .cbb file.");
+        }
+
+        function exportHTML() {
+            if (!currentCompiledHtml) {
+                runCBSharp();
+            }
+            const projectName = document.getElementById('project-name-input').value.trim() || "project";
+            const blob = new Blob([currentCompiledHtml], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${projectName.toLowerCase().replace(/\s+/g, '_')}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+            logConsole("Website exported as standalone HTML file.");
+        }
+
+        function openPreviewInNewTab() {
+            if (!currentCompiledHtml) runCBSharp();
+            const newWindow = window.open();
+            newWindow.document.write(currentCompiledHtml);
+            newWindow.document.close();
+        }
+
+        // Preview Mode Toggle (Desktop / Mobile)
+        function setPreviewMode(mode) {
+            const wrapper = document.getElementById('preview-frame-wrapper');
+            const btnDesktop = document.getElementById('btn-desktop');
+            const btnMobile = document.getElementById('btn-mobile');
+
+            if (mode === 'mobile') {
+                wrapper.style.width = '375px';
+                wrapper.style.height = '667px';
+                wrapper.style.margin = 'auto';
+                wrapper.classList.add('rounded-3xl', 'border-4', 'border-slate-700');
+                btnMobile.className = "px-2 py-0.5 rounded bg-blue-600 text-white text-[11px] transition";
+                btnDesktop.className = "px-2 py-0.5 rounded text-slate-400 hover:text-white text-[11px] transition";
+            } else {
+                wrapper.style.width = '100%';
+                wrapper.style.height = '100%';
+                wrapper.style.margin = '0';
+                wrapper.classList.remove('rounded-3xl', 'border-4', 'border-slate-700');
+                btnDesktop.className = "px-2 py-0.5 rounded bg-blue-600 text-white text-[11px] transition";
+                btnMobile.className = "px-2 py-0.5 rounded text-slate-400 hover:text-white text-[11px] transition";
+            }
+        }
+
+        // Console Controls
+        let consoleOpen = true;
+        function toggleConsole() {
+            const panel = document.getElementById('console-panel');
+            const icon = document.getElementById('console-toggle-icon');
+            if (consoleOpen) {
+                panel.style.height = '33px';
+                icon.className = "fa-solid fa-chevron-up";
+                consoleOpen = false;
+            } else {
+                panel.style.height = '140px';
+                icon.className = "fa-solid fa-chevron-down";
+                consoleOpen = true;
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = '<div class="text-slate-500">Console cleared.</div>';
+        }
+
+        function logConsole(msg) {
+            const consoleOutput = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            consoleOutput.innerHTML += `<div class="text-slate-400">[${timestamp}] ${msg}</div>`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // Mobile Tab Switcher
+        function switchMobileTab(tab) {
+            const editorPanel = document.getElementById('editor-panel');
+            const previewPanel = document.getElementById('preview-panel');
+            const tabEditor = document.getElementById('mob-tab-editor');
+            const tabPreview = document.getElementById('mob-tab-preview');
+            const tabConsole = document.getElementById('mob-tab-console');
+
+            // Reset tab colors
+            tabEditor.className = "flex flex-col items-center justify-center flex-1 py-1 text-slate-400";
+            tabPreview.className = "flex flex-col items-center justify-center flex-1 py-1 text-slate-400";
+            tabConsole.className = "flex flex-col items-center justify-center flex-1 py-1 text-slate-400";
+
+            if (tab === 'editor') {
+                editorPanel.classList.remove('hidden');
+                previewPanel.classList.add('hidden');
+                tabEditor.className = "flex flex-col items-center justify-center flex-1 py-1 text-blue-400";
+            } else if (tab === 'preview') {
+                editorPanel.classList.add('hidden');
+                previewPanel.classList.remove('hidden');
+                previewPanel.classList.add('flex', 'w-full');
+                tabPreview.className = "flex flex-col items-center justify-center flex-1 py-1 text-blue-400";
+            } else if (tab === 'console') {
+                editorPanel.classList.remove('hidden');
+                previewPanel.classList.add('hidden');
+                tabConsole.className = "flex flex-col items-center justify-center flex-1 py-1 text-blue-400";
+                // Scroll console down
+                const consoleOutput = document.getElementById('console-output');
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>
